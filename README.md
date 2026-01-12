@@ -1,124 +1,94 @@
-# Prueba Técnica Full-Stack: Tiendas DAKA - Auth & Pokémon Sprites
+# Prueba Técnica Full-Stack: NestJS + Vue 3 + Docker
 
-Este proyecto es una solución completa para el reto técnico de Tiendas DAKA. Implementa un sistema robusto de autenticación y una aplicación en tiempo real para visualizar sprites de Pokémon, demostrando habilidades en desarrollo Full Stack con **NestJS** y **Vue.js**, uso de contenedores **Docker**, y diseño moderno con **Tailwind CSS**.
-
----
-
-## 🚀 Tecnologías Utilizadas
-
-### Frontend (Cliente)
--   **Framework**: [Vue.js 3](https://vuejs.org/) (Composition API, `<script setup>`)
--   **Build Tool**: [Vite](https://vitejs.dev/)
--   **Styling**: [Tailwind CSS](https://tailwindcss.com/) (Diseño responsivo y animaciones personalizadas)
--   **State Management**: [Pinia](https://pinia.vuejs.org/) (Gestión de sesión y usuario)
--   **Data Fetching**: [TanStack Query (Vue Query)](https://tanstack.com/query/latest) (Gestión eficiente del estado asíncrono y caché)
--   **Routing**: [Vue Router](https://router.vuejs.org/) (Navegación y protección de rutas)
--   **Form Validation**: [Vee-Validate](https://vee-validate.logaretm.com/) + [Zod](https://zod.dev/) (Validación de esquemas estricta)
--   **Real-time**: [Socket.io Client](https://socket.io/) (Comunicación bidireccional para sprites)
-
-### Backend (Servidor)
--   **Framework**: [NestJS](https://nestjs.com/) (Arquitectura modular y escalable)
--   **Database ORM**: [TypeORM](https://typeorm.io/)
--   **Database**: PostgreSQL
--   **Authentication**:
-    -   [Passport-JWT](https://docs.nestjs.com/security/authentication) (Estrategia Bearer)
-    -   **JWT Blocklist**: Implementación en memoria para invalidación real de tokens al cierre de sesión.
--   **Real-time**: NestJS Gateway (WebSocket con autenticación integrada)
--   **API Documentation**: Swagger (Configurado base)
-
-### Infraestructura & DevOps
--   **Docker**: Contenedorización completa de servicios.
--   **Docker Compose**: Orquestación de Frontend, Backend y Base de datos con **Hot-Reload** habilitado para desarrollo fluido.
+Bienvenido a la prueba técnica para el rol de Consultor de Tecnología. Este repositorio contiene una base de código moderna pero incompleta funcionalmente, diseñada para evaluar tus habilidades en desarrollo Full-Stack, arquitectura de software, contenedores y seguridad.
 
 ---
 
-## ✨ Características Implementadas (Plus +)
+## 🎯 Objetivo
 
-Además de los requerimientos base, se han añadido múltiples mejoras para elevar la calidad y experiencia de usuario:
+Tu misión es **completar la implementación** de una aplicación que gestiona autenticación de usuarios y visualización de sprites de Pokémon en tiempo real, siguiendo estrictamente los requerimientos definidos.
 
-### 🔐 Autenticación Avanzada
--   **Flujo Completo**: Registro, Inicio de Sesión y **Cierre de Sesión seguro**.
--   **Seguridad Mejorada**: Las contraseñas se visualizan con toggle (ojo) y se validan con esquemas Zod robustos.
--   **Logout Real**: Al cerrar sesión, el token JWT se añade a una "Blocklist" en el backend, impidiendo su reutilización inmediata.
--   **Rutas Protegidas**: *Guards* globales en Frontend y Backend aseguran que solo usuarios autenticados accedan al Dashboard.
+No buscamos solo "que funcione", buscamos:
 
-### ⚡ Dashboard Interactivo (Pokémon Sprites)
--   **WebSockets con Auth**: La conexión Socket.io se autentica automáticamente con el JWT del usuario.
--   **Animaciones Fluidas**:
-    -   *Staggered List Entrance*: Los sprites aparecen en cascada suavemente.
-    -   *Modales Animados*: Transiciones de entrada/salida y escala para modales.
--   **Paginación Cliente**: Control total de la visualización (12, 24, 36 items) con corrección automática de estado.
--   **Preview de Imagen**: Modal para visualizar el sprite en alta resolución al hacer clic.
--   **Gestión de Datos**:
-    -   **Delete All**: Funcionalidad para limpiar toda la lista de un golpe.
-    -   **Optimistic Updates**: La interfaz reacciona instantáneamente a las acciones del usuario.
-
-### 🎨 UI/UX Moderna
--   **Diseño Premium**: Interfaz limpia tipo "Glassmorphism" sutil, sombras suaves y bordes redondeados.
--   **Feedback Visual**:
-    -   Indicadores de carga (Spinners).
-    -   Validación de formularios en tiempo real con bordes rojos/verdes.
--   **Responsive**: Adaptable a móviles y escritorio (Grid system).
+- **Calidad de código**: Clean Code, SOLID, tipado fuerte.
+- **Seguridad**: Implementación proactiva de OWASP Top 10.
+- **Infraestructura**: Manejo correcto de Docker y variables de entorno.
+- **Manejo de errores**: Robustez ante fallos externos.
 
 ---
 
-## 📂 Arquitectura del Proyecto
+## 📚 Documentación Importante
 
-### Estructura Backend (`/backend`)
+Antes de empezar, es **OBLIGATORIO** leer los siguientes documentos incluidos en este repositorio:
+
+1. [`TECHNICAL_ASSESSMENT.md`](./TECHNICAL_ASSESSMENT.md): Contiene las instrucciones detalladas, historias de usuario, criterios de aceptación y guía de entrega.
+2. [`OWASP_REQUIREMENTS.md`](./OWASP_REQUIREMENTS.md): Detalla los requisitos de seguridad **críticos** que debes implementar. Su cumplimiento representa el 25% de la nota.
+
+---
+
+## 🛠️ Stack Tecnológico Base
+
+- **Backend**: NestJS, TypeORM, PostgreSQL.
+- **Frontend**: Vue 3, Pinia, TailwindCSS, Vee-Validate.
+- **Infraestructura**: Docker, Docker Compose (Multi-stage builds).
+
+---
+
+## 🚀 Cómo Iniciar
+
+El proyecto ha sido configurado para soportar dos entornos mediante Docker Compose.
+
+### 1. Configuración de Entorno
+
+Copia el archivo de ejemplo y configura tus variables (especialmente `JWT_SECRET` y credenciales de DB):
+
 ```bash
-src/
-├── auth/           # Módulo de Autenticación
-│   ├── strategies/ # JWT Strategy (con validación de Blocklist)
-│   ├── guards/     # Guardias de rutas
-│   └── ...
-├── pokemon/        # Módulo Principal de Negocio
-│   ├── pokemon.gateway.ts  # Manejo de WebSockets
-│   ├── pokemon.service.ts  # Lógica de negocio y PokeAPI
-│   └── ...
-└── main.ts         
+cp .env.example .env
 ```
 
-### Estructura Frontend (`/frontend`)
+### 2. Ejecutar en Desarrollo (Hot-Reload)
+
+Para desarrollar, utiliza el archivo `docker-compose.dev.yml`. Este entorno monta el código fuente como volúmenes para permitir hot-reload tanto en backend como frontend.
+
 ```bash
-src/
-├── api/            # Configuración de Axios
-├── views/          # Páginas (Login, Register, Dashboard, Home)
-├── components/     # Componentes reutilizables
-├── stores/         # Pinia Stores (Auth)
-├── assets/         # Estilos (Tailwind Base)
-└── main.ts         # Configuración de Vue
+# Levantar el entorno de integración
+docker-compose -f docker-compose.dev.yml up --build
 ```
+
+- **Frontend**: <http://localhost:5173>
+- **Backend**: <http://localhost:3000>
+- **Swagger**: <http://localhost:3000/api/docs>
+
+> **IMPORTANTE**: Deberás completar el archivo `docker-compose.dev.yml` (y los `Dockerfile`) ya que contienen secciones `TODO`.
+
+### 3. Ejecutar en Modo Test/Producción
+
+Para verificar tu entrega final, utiliza `docker-compose.test.yml`. Este entorno simula producción: no monta volúmenes de código, usa imágenes compiladas y optimizadas, y sirve el frontend con Nginx.
+
+```bash
+docker-compose -f docker-compose.test.yml up --build
+```
+
+- **App**: <http://localhost:80> (o el puerto que configures)
 
 ---
 
-## 🚀 Cómo Ejecutar el Proyecto
+## 🧪 Resumen de Tareas Pendientes
 
-El proyecto está totalmente dockerizado para facilitar su ejecución.
+El código base tiene múltiples comentarios `TODO` guiándote. Las tareas principales son:
 
-1.  **Requisitos Prerrequisitos**: Tener instalado Docker y Docker Compose.
-2.  **Clonar el repositorio**.
-3.  **Iniciar la aplicación**:
+1. **Backend Auth**: Completar `AuthService` (login, register), `JwtStrategy` y proteger rutas.
+2. **Backend Pokémon**: Integrar PokeAPI, mejorar manejo de errores y preparar el Gateway (que fue eliminado intencionalmente).
+3. **Frontend**: Implementar vistas de Login, Registro y Dashboard (actualmente son placeholders).
+4. **Docker**: Configurar correctamente los Dockerfiles multi-stage y las redes en docker-compose.
+5. **Seguridad**: Asegurar la aplicación según `OWASP_REQUIREMENTS.md`.
 
-    Desde la raíz del proyecto, ejecuta:
+---
 
-    ```bash
-    docker-compose up --build
-    ```
+## 📦 Entrega
 
-4.  **Acceder a la Aplicación**:
-    -   **Frontend**: [http://localhost:5173](http://localhost:5173)
-    -   **Backend API**: [http://localhost:3000](http://localhost:3000)
+1. Asegúrate de que `docker-compose.test.yml` levante todo el stack correctamente.
+2. Incluye un archivo `SOLUTION.md` (opcional) si deseas explicar decisiones técnicas complejas.
+3. Sube tu solución a un repositorio o entrega el archivo comprimido según las instrucciones de RRHH.
 
-.env Backend 
-
-POSTGRES_DB=technical-test_db
-POSTGRES_USER=technical-test
-POSTGRES_PASSWORD=1234
-POSTGRES_INITDB_ARGS="--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
-DATABASE_USER=technical-test
-DATABASE_PASSWORD=1234
-DATABASE_NAME=technical-test_db
-
-.env Frontend
-
-VITE_API_URL=http://localhost:3000
+¡Mucho éxito! Demuestra tu potencial. 🚀

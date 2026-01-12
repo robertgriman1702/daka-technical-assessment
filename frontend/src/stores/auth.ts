@@ -8,65 +8,43 @@ export interface User {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-    const token = ref<string | null>(sessionStorage.getItem('token'));
-    const user = ref<User | null>(null);
+    // TODO: Definir estado reactivo
+    // const token = ref<string | null>(...);
+    // const user = ref<User | null>(null);
 
-    const setToken = (newToken: string) => {
-        token.value = newToken;
-        sessionStorage.setItem('token', newToken);
-    };
-
-    const setUser = (newUser: User) => {
-        user.value = newUser;
-    };
-
-    const logout = async () => {
-        try {
-            await client.post('/auth/logout');
-        } catch (error) {
-            console.error('Logout failed', error);
-        } finally {
-            token.value = null;
-            user.value = null;
-            sessionStorage.removeItem('token');
-        }
-    };
-
+    // TODO: Implementar acción de login
+    // Requisitos:
+    // 1. Llamar endpoint /auth/login
+    // 2. Guardar token (evaluar seguridad: localStorage vs cookies)
+    // 3. Actualizar estado de usuario
     const login = async (username: string, password: string) => {
-        const { data } = await client.post<{ accessToken: string; user: User }>('/auth/login', {
-            username,
-            password,
-        });
-        setToken(data.accessToken);
-        setUser(data.user);
+        throw new Error('Not implemented');
     };
 
+    // TODO: Implementar acción de registro
     const register = async (username: string, password: string, confirmPassword: string) => {
-        await client.post('/auth/register', {
-            username,
-            password,
-            confirmPassword,
-        });
+        throw new Error('Not implemented');
     };
 
+    // TODO: Implementar logout
+    // Requisitos:
+    // 1. Llamar endpoint /auth/logout
+    // 2. Limpiar token y estado de usuario
+    const logout = async () => {
+        throw new Error('Not implemented');
+    };
+
+    // TODO: Implementar fetchUser para persistencia de sesión
     const fetchUser = async () => {
-        if (!token.value) return;
-        try {
-            const { data } = await client.get<User>('/auth/me');
-            setUser(data);
-        } catch (error) {
-            logout();
-        }
+        // Verificar token y traer perfil
     };
 
     return {
-        token,
-        user,
-        setToken,
-        setUser,
-        logout,
+        // token,
+        // user,
         login,
         register,
+        logout,
         fetchUser,
     };
 });

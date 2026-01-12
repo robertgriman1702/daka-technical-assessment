@@ -8,74 +8,47 @@ import { User } from './entities/user.entity';
 
 import { JwtService } from '@nestjs/jwt';
 
-import { PokemonService } from '../pokemon/pokemon.service';
-
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-    private readonly pokemonService: PokemonService,
   ) { }
 
 
-  private revokedTokens: Set<string> = new Set();
-
-  // ... existing code ...
-
-  async logout(token: string) {
-    this.pokemonService.removeAll();
-    this.revokedTokens.add(token);
-    return {
-      message: 'User logged out successfully',
-    };
+  // TODO: Implementar método de registro
+  // Requisitos:
+  // 1. Verificar que el usuario no exista (username único)
+  // 2. Hashear la contraseña usando bcrypt con salt rounds >= 10
+  // 3. Crear y guardar el nuevo usuario en la base de datos
+  // 4. Retornar un mensaje de éxito
+  // 5. Manejar errores apropiadamente (try/catch)
+  async register(registerDto: RegisterDto) {
+    // TODO: Implementar lógica de registro
+    throw new Error('Method not implemented - Complete this functionality');
   }
 
-  isTokenRevoked(token: string): boolean {
-    return this.revokedTokens.has(token);
-  }
 
+  // TODO: Implementar método de validación de usuario
+  // Requisitos:
+  // 1. Buscar usuario por username
+  // 2. Comparar contraseña usando bcrypt.compare()
+  // 3. Retornar usuario (sin password) si es válido, null si no
   async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.userRepository.findOneBy({ username });
-    if (user && (await bcrypt.compare(pass, user.password))) {
-      const { password, ...result } = user;
-      return result;
-    }
+    // TODO: Implementar validación de credenciales
     return null;
   }
 
+  // TODO: Implementar método de login
+  // Requisitos:
+  // 1. Generar JWT token con payload { username, sub: userId }
+  // 2. Retornar { accessToken, user }
+  // 3. El token debe tener expiración (configurado en auth.module.ts)
   async login(user: any) {
-    const payload = { username: user.username, sub: user.id };
-    return {
-      accessToken: this.jwtService.sign(payload),
-      user,
-    };
+    // TODO: Implementar generación de JWT
+    throw new Error('Method not implemented - Complete this functionality');
   }
-
-  async register(registerDto: RegisterDto) {
-    const user = await this.userRepository.findOneBy({
-      username: registerDto.username,
-    });
-
-    if (user) {
-      throw new BadRequestException('User already exists');
-    }
-
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-
-    const newUser = this.userRepository.create({
-      username: registerDto.username,
-      password: hashedPassword,
-    });
-
-    await this.userRepository.save(newUser);
-
-    return {
-      message: 'User created successfully',
-    };
-  }
-
 
 
   getProfile(user: any) {
@@ -91,3 +64,4 @@ export class AuthService {
     return null;
   }
 }
+

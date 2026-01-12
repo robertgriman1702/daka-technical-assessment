@@ -10,24 +10,28 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         configService: ConfigService,
         private readonly authService: AuthService,
     ) {
+        // TODO: Completar configuración de JWT Strategy
+        // Requisitos:
+        // 1. Obtener el secret desde ConfigService
+        // 2. Validar que el secret exista (lanzar error si no)
+        // 3. No usar fallback hardcodeado ('secretKey' es inseguro)
+        const secret = configService.get<string>('JWT_SECRET');
+
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: configService.get<string>('JWT_SECRET') || 'secretKey',
-            passReqToCallback: true,
+            secretOrKey: secret || 'secretKey',  // TODO: Eliminar fallback y validar secret
         });
     }
 
-    async validate(req: any, payload: any) {
-        const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-        if (token && this.authService.isTokenRevoked(token)) {
-            throw new UnauthorizedException('Token is revoked');
-        }
-
-        const user = await this.authService.getUserById(payload.sub);
-        if (!user) {
-            throw new UnauthorizedException();
-        }
-        return user;
+    // TODO: Completar método validate
+    // Requisitos:
+    // 1. Extraer userId del payload (payload.sub)
+    // 2. Buscar usuario en base de datos usando authService.getUserById()
+    // 3. Si no existe, lanzar UnauthorizedException
+    // 4. Retornar el usuario encontrado
+    async validate(payload: any) {
+        // TODO: Implementar validación del JWT payload
+        throw new Error('Method not implemented - Complete JWT validation');
     }
 }

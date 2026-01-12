@@ -18,19 +18,19 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
+  // TODO: Completar implementación del login
+  // Requisitos:
+  // 1. Validar usuario usando authService.validateUser()
+  // 2. Si las credenciales son inválidas, lanzar UnauthorizedException
+  // 3. Si son válidas, retornar el resultado de authService.login()
+  // 4. Agregar manejo de errores apropiado (try/catch)
   @Post('login')
   @ApiOperation({ summary: 'User login' })
   @ApiResponse({ status: 200, description: 'Return access token.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async login(@Body() loginDto: LoginDto) {
-    const user = await this.authService.validateUser(
-      loginDto.username,
-      loginDto.password,
-    );
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-    return this.authService.login(user);
+    // TODO: Implementar lógica de login
+    throw new Error('Method not implemented - Complete this functionality');
   }
 
   @Post('register')
@@ -41,24 +41,18 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
-  @Post('logout')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'User logout' })
-  @ApiResponse({ status: 200, description: 'User successfully logged out.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  logout(@Request() req) {
-    const token = req.headers.authorization?.split(' ')[1];
-    return this.authService.logout(token);
-  }
-
+  // TODO: Implementar protección con JWT Guard
+  // Esta ruta debe estar protegida y solo accesible con token válido
   @Get('me')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth()
+  // TODO: Descomentar y configurar el guard
+  // @UseGuards(AuthGuard('jwt'))
+  // @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({ status: 200, description: 'Return user profile.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   getProfile(@Request() req) {
-    return req.user;
+    // TODO: Una vez implementado el guard, retornar req.user
+    throw new Error('Method not implemented - Implement JWT guard first');
   }
 }
+
