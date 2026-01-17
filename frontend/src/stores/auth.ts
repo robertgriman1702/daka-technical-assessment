@@ -1,50 +1,82 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import client from '@/api/client';
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import client from '@/api/client'
 
 export interface User {
-    id: number;
-    username: string;
+  id: number
+  username: string
 }
 
 export const useAuthStore = defineStore('auth', () => {
-    // TODO: Definir estado reactivo
-    // const token = ref<string | null>(...);
-    // const user = ref<User | null>(null);
+  const token = ref<string | null>(sessionStorage.getItem('token'))
+  const user = ref<User | null>(null)
 
-    // TODO: Implementar acción de login
-    // Requisitos:
-    // 1. Llamar endpoint /auth/login
-    // 2. Guardar token (evaluar seguridad: localStorage vs cookies)
-    // 3. Actualizar estado de usuario
-    const login = async (username: string, password: string) => {
-        throw new Error('Not implemented');
-    };
+  const isAuthenticated = computed(() => !!token.value)
 
-    // TODO: Implementar acción de registro
-    const register = async (username: string, password: string, confirmPassword: string) => {
-        throw new Error('Not implemented');
-    };
+  // 👤 PERFIL
+  const fetchUser = async () => {
+    if (!token.value) return
+    try {
+      const { data } = await client.get<User>('/auth/me')
+      user.value = data
+    } catch (e) {
+      await logout()
+      throw e
+    }
+  }
 
-    // TODO: Implementar logout
-    // Requisitos:
-    // 1. Llamar endpoint /auth/logout
-    // 2. Limpiar token y estado de usuario
-    const logout = async () => {
-        throw new Error('Not implemented');
-    };
+  const initAuth = async () => {
+    if (token.value && !user.value) {
+      try {
+        await fetchUser()
+      } catch {
+      }
+    }
+  }
 
-    // TODO: Implementar fetchUser para persistencia de sesión
-    const fetchUser = async () => {
-        // Verificar token y traer perfil
-    };
+  // 🔐 LOGIN
+  const login = async (username: string, password: string) => {
+    const { data } = await client.post('/auth/login', { username, password })
 
-    return {
-        // token,
-        // user,
-        login,
-        register,
-        logout,
-        fetchUser,
-    };
-});
+    const receivedToken =
+        data.access_token ??
+        data.token ??
+        data.accessToken   
+
+    if (!receivedToken) {
+      throw new Error('Auth response did not include a token (access_token/token).')
+    }
+
+    token.value = receivedToken
+    sessionStorage.setItem('token', receivedToken)
+
+    await fetchUser()
+  }
+
+  // 📝 REGISTER
+  const register = async (
+    username: string,
+    password: string,
+    confirmPassword: string,
+  ) => {
+    await client.post('/auth/register', { username, password, confirmPassword })
+  }
+
+  // 🚪 LOGOUT
+  const logout = async () => {
+    token.value = null
+    user.value = null
+    sessionStorage.removeItem('token')
+  }
+
+  return {
+    token,
+    user,
+    isAuthenticated,
+    initAuth,
+    login,
+    register,
+    fetchUser,
+    logout,
+  }
+})

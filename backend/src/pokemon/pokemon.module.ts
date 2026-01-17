@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
-import { PokemonService } from './pokemon.service';
-// TODO: Crear e importar PokemonGateway aquí
-// import { PokemonGateway } from './pokemon.gateway';
+import { JwtModule } from '@nestjs/jwt';
 import { PokemonController } from './pokemon.controller';
+import { PokemonService } from './pokemon.service';
+import { PokemonGateway } from './pokemon.gateway.TODO';
 
 @Module({
-  controllers: [PokemonController],
-  providers: [
-    PokemonService,
-    // TODO: Agregar PokemonGateway a providers después de crearlo
-    // PokemonGateway,
+  imports: [
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+    }),
   ],
-  exports: [PokemonService],
+  controllers: [PokemonController],
+  providers: [PokemonService, PokemonGateway],
 })
-export class PokemonModule { }
+export class PokemonModule {}
+

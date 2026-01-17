@@ -6,17 +6,17 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
+let intervalId: number
+
 const handleLogout = async () => {
   await authStore.logout()
   router.push('/login')
 }
 
-// Watcher para detectar eliminación manual del token
-let intervalId: number
 onMounted(() => {
   intervalId = window.setInterval(() => {
     const storedToken = sessionStorage.getItem('token')
-    if (authStore.token && !storedToken) {
+    if (authStore.token !== null && storedToken === null) {
       handleLogout()
     }
   }, 1000)
@@ -34,7 +34,6 @@ onUnmounted(() => {
 </template>
 
 <style>
-/* Global resets if needed, but Tailwind handles most */
 html, body, #app {
   height: 100%;
   margin: 0;

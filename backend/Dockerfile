@@ -1,28 +1,48 @@
-# Multi-Stage Build para Backend
-
-# TODO: Completar STAGE 1 (Builder)
-# Usa la imagen node:20-slim
-# 1. Copiar package files
-# 2. Instalar dependencias
-# 3. Copiar código fuente
-# 4. Compilar (npm run build)
+# ----------------------------
+# STAGE 1: Builder
+# ----------------------------
 FROM node:20-slim AS builder
 
 WORKDIR /usr/src/app
-# ... completar aquí ...
 
-# TODO: Completar STAGE 2 (Production)
-# Usa la imagen node:20-slim
-# 1. Copiar package files
-# 2. Instalar SOLO dependencias de producción (npm ci --only=production)
-# 3. Copiar la carpeta 'dist' del stage builder
-# 4. Configurar usuario no-root (USER node)
-# 5. Exponer puerto 3000
-# 6. Definir CMD
+# 1) Copy package files
+COPY package*.json ./
+
+# 2) Install deps (incluye devDeps para compilar Nest)
+RUN npm ci
+
+# 3) Copy source
+COPY . .
+
+# 4) Build
+RUN npm run build
+
+
+# ----------------------------
+# STAGE 2: Production
+# ----------------------------
 FROM node:20-slim AS production
 
 WORKDIR /usr/src/app
-# ... completar aquí ...
 
-# HINT: Recuerda copiar dist de la etapa anterior:
-# COPY --from=builder /usr/src/app/dist ./dist
+ENV NODE_ENV=production
+
+# 1) Copy package files
+COPY package*.json ./
+
+# 2) Install only production deps
+RUN npm ci --omit=dev
+
+# 3) Copy compiled dist from builder
+COPY --from=builder /usr/src/app/dist ./dist
+
+# COPY --from=builder /usr/src/app/package.json ./package.json
+
+# 4) Use non-root user
+USER node
+
+# 5) Expose port
+EXPOSE 3000
+
+# 6) Run app
+CMD ["node", "dist/main.js"]

@@ -1,33 +1,79 @@
-version: '3.8'
-
 services:
-  # Base de datos (Simulación Producción)
   db:
     image: postgres:17-alpine
     container_name: postgres-test
-    # TODO: Configurar base de datos segura
-    # 1. Asegurar que solo sea accesible por backend (red interna)
-    # 2. Configurar usuario y contraseña seguros (desde .env)
-    # 3. Configurar healthcheck
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-test-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
 
-    # Backend (Production Build)
   backend:
-    # TODO: Configurar backend para producción/test
-    # 1. Usar build 'target: production' del Dockerfile
-    # 2. NO montar volúmenes de código fuente (código inmutable)
-    # 3. Configurar NODE_ENV=production
-    # 4. Pasar variables de entorno de producción
-    depends_on:
-      - db
+    container_name: backend-test
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      NODE_ENV: test
+      PORT: 3000
 
-  # Frontend (Nginx Server)
+      # --- Variables DB (por compatibilidad con distintas configs) ---
+      # Preferidas
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: ${POSTGRES_DB}
+
+      # Alternativas comunes
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+
+      # Fallbacks
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "3000"
+    networks:
+      - internal
+
   frontend:
-    # TODO: Configurar frontend servido por Nginx
-    # 1. Usar build 'target: production' del Dockerfile
-    # 2. Exponer puerto 80
-    # 3. Asegurar comunicación con backend
+    container_name: frontend-test
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "80:80"
     depends_on:
       - backend
+    networks:
+      - internal
 
-# TODO: Definir red interna (bridge) para que los servicios se comuniquen sin exponer DB
-networks: # internal-network: ...
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  postgres-test-data:

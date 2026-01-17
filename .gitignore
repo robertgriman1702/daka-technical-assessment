@@ -3,6 +3,7 @@ dist/
 .tmp
 .idea
 .env
+frontend/.env.production
 coverage/
 .npm
 .vscode
